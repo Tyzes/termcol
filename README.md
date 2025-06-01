@@ -6,13 +6,12 @@ It allows you to easily add colors to your terminal output without dealing direc
 ## Table of Contents
 
 - [Installation](#installation)
+- [Quick Preview](#quick-preview)
 - [Features](#features)
-- [When to Use](#when-to-use)
 - [Available Colors](#available-colors)
 - [Usage Examples](#usage-examples)
 - [Functions](#functions)
 - [Configuration Options](#configuration-options)
-- [Examples](#examples)
 
 ## Installation
 
@@ -21,11 +20,6 @@ To install the package, use the following command:
 ```bash
 go get github.com/tyzes/termcol
 ```
-
-## Features
-
-- Format strings with ANSI escape codes
-- Supports both color placeholders and standard `fmt` formatting
 
 ## Quick Preview
 
@@ -37,9 +31,10 @@ termcol.Printlnf("&rRed &gGreen &bBlue §&FBold §&UUnderlined")
 
 ![termcol preview](examples/quick-preview.gif)
 
-## When to Use
+## Features
 
-Perfect for CLIs, logs, debugging tools, or any Go program that outputs styled text to the terminal.
+- Format strings with ANSI escape codes
+- Supports both color placeholders and standard `fmt` formatting
 
 ## Available Colors
 
@@ -86,20 +81,23 @@ import (
 func main() {
 	var s string
 
-	// Colorize a string using default color key ('&') 
-	s, _ = termcol.Sprintc("&Red &Green &Blue & &Bold-Red", termcol.Red, termcol.Green, termcol.Blue, termcol.Red, termcol.Bold)
+	// Colorize a string with direct color arguments and using fmt formatting
+	s, _ = termcol.Sprintf("&r%s &g%s &b%s &r&F%s §%s",
+		"Red", "Green", "Blue", "Bold-Red", "Reset")
 	fmt.Println(s)
 	// Note: a space in between two & will be stripped and both & will be used for formatting.
 	// To print a literal '&', escape it by writing "&&"
 
-	// Colorize a string with direct color arguments and using fmt formatting
-	s, _ = termcol.Sprintf("&r%s &g%s &b%s &r&F%s §%s", "Red", "Green", "Blue", "Bold-Red", "Reset")
+	// Not all colors are available directly with & + color,
+	// in which case, you can use color constants as arguments.
+	s, _ = termcol.Sprintc("&Red &Green & & &Bold-BrightRed with Yellow Background",
+		termcol.Red, termcol.Green, termcol.Bold, termcol.BrightRed, termcol.YellowBg)
 	fmt.Println(s)
 
 	// Colorize a string with different formatting options
 	f := termcol.NewFormatter()
-	f.SetKey('!')
-	s, _ = f.Sprintf("!r%s", "Red")
+	f.SetKey('#')
+	s, _ = f.Sprintf("#r%s", "Red")
 	fmt.Println(s)
 }
 ```
@@ -110,7 +108,7 @@ For more examples, please refer to the [examples directory](examples).
 
 ### Color Placeholder Functions (`*c`)
 
-These functions accept **color/style constants** as additional arguments (e.g. `termcol.Red`, `termcol.Bold`):
+These functions accept color constants as additional arguments (e.g. `termcol.Red`, `termcol.Bold`):
 
 - `Printc` – Prints a string using color placeholders to standard output.
 - `Sprintc` – Returns a color-formatted string.
@@ -119,7 +117,7 @@ These functions accept **color/style constants** as additional arguments (e.g. `
 
 ### Formatted Output Functions (`*f`)
 
-These work like Go's `fmt.*f` functions and accept **format strings with arguments**, not color constants:
+These work like Go's `fmt.*f` functions and accept format strings with arguments, not color constants:
 
 - `Printf` – Prints a formatted string (like `fmt.Printf`).
 - `Sprintf` – Returns a formatted string (like `fmt.Sprintf`).

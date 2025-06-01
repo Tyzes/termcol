@@ -67,7 +67,13 @@ func replace(f *Formatter, text string, del int, keys []int, colors []colorKey) 
 func colorize(f *Formatter, text string, colors []colorKey) (string, error) {
 	keys := parse(f, text)
 	if len(keys) != len(colors) {
-		return "", ParseError{Err: fmt.Sprintf("Number of colors (%d) does not match number of keys (%d)", len(colors), len(keys))}
+		return "", ParseError{fmt.Sprintf("Number of colors (%d) does not match number of keys (%d)", len(colors), len(keys)), text, -1}
+	}
+
+	for i := 0; i < len(colors); i++ {
+		if colors[i] < 0 || int(colors[i]) >= len(colorValues) {
+			return "", ParseError{Err: fmt.Sprintf("Invalid color code %d at index %d", colors[i], i), Text: text, Pos: keys[i] + 1}
+		}
 	}
 
 	text = replace(f, text, 1, keys, colors)
@@ -88,10 +94,11 @@ func format(f *Formatter, text string) (string, error) {
 	var colors []colorKey
 	chars := []rune(text)
 	for i := 0; i < len(keys); i++ {
-		colors = append(colors, colorKeys[chars[keys[i]+1]])
-		if colors[len(colors)-1] == 0 {
+		color, ok := colorKeys[chars[keys[i]+1]]
+		if !ok {
 			return "", ParseError{Text: text, Pos: keys[i] + 1}
 		}
+		colors = append(colors, color)
 	}
 
 	text = replace(f, text, 2, keys, colors)

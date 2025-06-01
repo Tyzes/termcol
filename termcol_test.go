@@ -69,9 +69,9 @@ func TestSprintc(t *testing.T) {
 		expected string
 	}
 	errTests := []testSprintcErr{
-		{"&Hello &World", []colorKey{Red, Green, Blue}, "termcol parse error: Number of colors (3) does not match number of keys (2)"},
-		{"&only one", []colorKey{}, "termcol parse error: Number of colors (0) does not match number of keys (1)"},
-		{"Hello World", []colorKey{Red}, "termcol parse error: Number of colors (1) does not match number of keys (0)"},
+		{"&Hello &World", []colorKey{Red, Green, Blue}, "termcol parse error: Number of colors (3) does not match number of keys (2)\n&Hello &World"},
+		{"&only one", []colorKey{}, "termcol parse error: Number of colors (0) does not match number of keys (1)\n&only one"},
+		{"Hello World", []colorKey{Red}, "termcol parse error: Number of colors (1) does not match number of keys (0)\nHello World"},
 	}
 
 	for _, v := range errTests {

@@ -12,12 +12,12 @@ type ParseError struct {
 }
 
 func (e ParseError) Error() string {
-	if e.Pos < 0 {
+	if e.Pos < 0 && len(e.Text) == 0 || len(e.Text) == 0 {
 		return "termcol parse error: " + e.Err
 	} else if e.Pos != 0 && e.Pos >= len(e.Text) {
 		return "termcol parse error: Illegal character at end of text"
-	} else if e.Text == "" {
-		return fmt.Sprintf("termcol parse error: %s", e.Err)
+	} else if e.Pos < 0 && len(e.Text) > 0 {
+		return fmt.Sprintf("termcol parse error: %s\n%s", e.Err, e.Text)
 	}
 
 	start := e.Pos - 15

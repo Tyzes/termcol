@@ -9,7 +9,7 @@ import (
 )
 
 // Default Formatter instance used for formatting.
-var df *Formatter = NewFormatter()
+var df = NewFormatter()
 
 // Formatter configures the different formatting options for terminal output.
 type Formatter struct {
@@ -219,57 +219,57 @@ func (f *Formatter) Errorf(text string, a ...any) (int, error) {
 
 // Global functions
 
-// Sprintc is a Wrapper for defaultFormatter.Sprintc
+// Sprintc is a Wrapper for defaultFormatter.Sprintc (Further information in Formatter.Sprintc)
 func Sprintc(text string, colors ...colorKey) (string, error) {
 	return df.Sprintc(text, colors...)
 }
 
-// Printc is a Wrapper for defaultFormatter.Printc
+// Printc is a Wrapper for defaultFormatter.Printc (Further information in Formatter.Printc)
 func Printc(text string, colors ...colorKey) (int, error) {
 	return df.Printc(text, colors...)
 }
 
-// Printlnc is a Wrapper for defaultFormatter.Printlnc
+// Printlnc is a Wrapper for defaultFormatter.Printlnc (Further information in Formatter.Printlnc)
 func Printlnc(text string, colors ...colorKey) (int, error) {
 	return df.Printlnc(text, colors...)
 }
 
-// Fprintc is a Wrapper for defaultFormatter.Fprintc
+// Fprintc is a Wrapper for defaultFormatter.Fprintc (Further information in Formatter.Fprintc)
 func Fprintc(w io.Writer, text string, colors ...colorKey) (int, error) {
 	return df.Fprintc(w, text, colors...)
 }
 
-// Sprintf is a Wrapper for defaultFormatter.Sprintf
+// Sprintf is a Wrapper for defaultFormatter.Sprintf (Further information in Formatter.Sprintf)
 func Sprintf(text string, a ...any) (string, error) {
 	return df.Sprintf(text, a...)
 }
 
-// Printf is a Wrapper for defaultFormatter.Printf
+// Printf is a Wrapper for defaultFormatter.Printf (Further information in Formatter.Printf)
 func Printf(text string, a ...any) (int, error) {
 	return df.Printf(text, a...)
 }
 
-// Printlnf is a Wrapper for defaultFormatter.Printlnf
+// Printlnf is a Wrapper for defaultFormatter.Printlnf (Further information in Formatter.Printlnf)
 func Printlnf(text string, a ...any) (int, error) {
 	return df.Printlnf(text, a...)
 }
 
-// Fprintf is a Wrapper for defaultFormatter.Fprintf
+// Fprintf is a Wrapper for defaultFormatter.Fprintf (Further information in Formatter.Fprintf)
 func Fprintf(w io.Writer, text string, a ...any) (int, error) {
 	return df.Fprintf(w, text, a...)
 }
 
-// Successf is a Wrapper for defaultFormatter.Successf
+// Successf is a Wrapper for defaultFormatter.Successf (Further information in Formatter.Successf)
 func Successf(text string, a ...any) (int, error) {
 	return df.Successf(text, a...)
 }
 
-// Warningf is a Wrapper for defaultFormatter.Warningf
+// Warningf is a Wrapper for defaultFormatter.Warningf (Further information in Formatter.Warningf)
 func Warningf(text string, a ...any) (int, error) {
 	return df.Warningf(text, a...)
 }
 
-// Errorf is a Wrapper for defaultFormatter.Errorf
+// Errorf is a Wrapper for defaultFormatter.Errorf (Further information in Formatter.Errorf)
 func Errorf(text string, a ...any) (int, error) {
 	return df.Errorf(text, a...)
 }
