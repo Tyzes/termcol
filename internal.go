@@ -72,7 +72,7 @@ func colorize(f *Formatter, text string, colors []colorKey) (string, error) {
 
 	for i := 0; i < len(colors); i++ {
 		if colors[i] < 0 || int(colors[i]) >= len(colorValues) {
-			return "", ParseError{Err: fmt.Sprintf("Invalid color code %d at index %d", colors[i], i), Text: text, Pos: keys[i] + 1}
+			return "", ParseError{fmt.Sprintf("Invalid color code %d as argument %d", colors[i], i+2), text, keys[i]}
 		}
 	}
 
