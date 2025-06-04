@@ -4,7 +4,6 @@ package termcol
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
 )
 
@@ -99,17 +98,17 @@ func (f *Formatter) Sprintc(text string, colors ...colorCode) string {
 }
 
 // Printc formats the text using Sprintc and prints it to stdout.
-func (f *Formatter) Printc(text string, colors ...colorCode) (int, error) {
+func (f *Formatter) Printc(text string, colors ...colorCode) int {
 	text = f.Sprintc(text, colors...)
-	i, err := fmt.Print(text)
-	return i, err
+	i, _ := fmt.Print(text)
+	return i
 }
 
 // Printlnc formats the text using Sprintc and prints it to stdout ending with a newline.
-func (f *Formatter) Printlnc(text string, colors ...colorCode) (int, error) {
+func (f *Formatter) Printlnc(text string, colors ...colorCode) int {
 	text = f.Sprintc(text, colors...)
-	i, err := fmt.Println(text)
-	return i, err
+	i, _ := fmt.Println(text)
+	return i
 }
 
 // Fprintc formats the text using Sprintc and prints it to the provided io.Writer.
@@ -134,54 +133,56 @@ func (f *Formatter) Sprintf(text string, a ...any) string {
 }
 
 // Printf formats the text using Sprintf and prints it to stdout.
-func (f *Formatter) Printf(text string, a ...any) (int, error) {
+func (f *Formatter) Printf(text string, a ...any) int {
 	text = f.Sprintf(text, a...)
-	i, err := fmt.Print(text)
-	return i, err
+	i, _ := fmt.Print(text)
+	return i
 }
 
 // Printlnf formats the text using Sprintf and prints it to stdout ending with a newline.
-func (f *Formatter) Printlnf(text string, a ...any) (int, error) {
+func (f *Formatter) Printlnf(text string, a ...any) int {
 	text = f.Sprintf(text, a...)
-	i, err := fmt.Println(text)
-	return i, err
+	i, _ := fmt.Println(text)
+	return i
 }
 
 // Fprintf formats the text using Sprintf and prints it to the provided io.Writer.
 func (f *Formatter) Fprintf(w io.Writer, text string, a ...any) (int, error) {
 	text = f.Sprintf(text, a...)
-	i, err := fmt.Fprint(w, text)
-	return i, err
+	return fmt.Fprint(w, text)
 }
 
 // Successf prints the text to stdout as a success message in green ending with a newline.
-func (f *Formatter) Successf(text string, a ...any) (int, error) {
+func (f *Formatter) Successf(text string, a ...any) int {
 	text = f.Sprintf(text, a...)
 	if f.resetAtEnd && !strings.Contains(text, "\033[") {
 		text = text + colorValues[Reset]
 	}
 	text = colorValues[f.successColor] + f.successText + text
-	return fmt.Fprintln(os.Stdout, text)
+	i, _ := fmt.Println(text)
+	return i
 }
 
 // Warningf prints the text to stdout as a warning message in yellow ending with a newline.
-func (f *Formatter) Warningf(text string, a ...any) (int, error) {
+func (f *Formatter) Warningf(text string, a ...any) int {
 	text = f.Sprintf(text, a...)
 	if f.resetAtEnd && !strings.Contains(text, "\033[") {
 		text = text + colorValues[Reset]
 	}
 	text = colorValues[f.warningColor] + f.warningText + text
-	return fmt.Fprintln(os.Stdout, text)
+	i, _ := fmt.Println(text)
+	return i
 }
 
 // Errorf prints the text to stdout as an error message in red ending with a newline.
-func (f *Formatter) Errorf(text string, a ...any) (int, error) {
+func (f *Formatter) Errorf(text string, a ...any) int {
 	text = f.Sprintf(text, a...)
 	if f.resetAtEnd && !strings.Contains(text, "\033[") {
 		text = text + colorValues[Reset]
 	}
 	text = colorValues[f.errorColor] + f.errorText + text
-	return fmt.Fprintln(os.Stdout, text)
+	i, _ := fmt.Println(text)
+	return i
 }
 
 // Global functions
@@ -192,12 +193,12 @@ func Sprintc(text string, colors ...colorCode) string {
 }
 
 // Printc is a Wrapper for defaultFormatter.Printc (Further information in Formatter.Printc)
-func Printc(text string, colors ...colorCode) (int, error) {
+func Printc(text string, colors ...colorCode) int {
 	return df.Printc(text, colors...)
 }
 
 // Printlnc is a Wrapper for defaultFormatter.Printlnc (Further information in Formatter.Printlnc)
-func Printlnc(text string, colors ...colorCode) (int, error) {
+func Printlnc(text string, colors ...colorCode) int {
 	return df.Printlnc(text, colors...)
 }
 
@@ -212,12 +213,12 @@ func Sprintf(text string, a ...any) string {
 }
 
 // Printf is a Wrapper for defaultFormatter.Printf (Further information in Formatter.Printf)
-func Printf(text string, a ...any) (int, error) {
+func Printf(text string, a ...any) int {
 	return df.Printf(text, a...)
 }
 
 // Printlnf is a Wrapper for defaultFormatter.Printlnf (Further information in Formatter.Printlnf)
-func Printlnf(text string, a ...any) (int, error) {
+func Printlnf(text string, a ...any) int {
 	return df.Printlnf(text, a...)
 }
 
@@ -227,17 +228,17 @@ func Fprintf(w io.Writer, text string, a ...any) (int, error) {
 }
 
 // Successf is a Wrapper for defaultFormatter.Successf (Further information in Formatter.Successf)
-func Successf(text string, a ...any) (int, error) {
+func Successf(text string, a ...any) int {
 	return df.Successf(text, a...)
 }
 
 // Warningf is a Wrapper for defaultFormatter.Warningf (Further information in Formatter.Warningf)
-func Warningf(text string, a ...any) (int, error) {
+func Warningf(text string, a ...any) int {
 	return df.Warningf(text, a...)
 }
 
 // Errorf is a Wrapper for defaultFormatter.Errorf (Further information in Formatter.Errorf)
-func Errorf(text string, a ...any) (int, error) {
+func Errorf(text string, a ...any) int {
 	return df.Errorf(text, a...)
 }
 
