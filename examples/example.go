@@ -12,7 +12,7 @@ func main() {
 	_, _ = termcol.Printc("&Red ", termcol.Red)
 
 	// Return formatted text as a string
-	str, _ := termcol.Sprintc("&Green ", termcol.Green)
+	str := termcol.Sprintc("&Green ", termcol.Green)
 
 	// Print formatted text to a specified io.Writer
 	_, _ = termcol.Fprintc(writer, "&Yellow ", termcol.Yellow)
@@ -24,7 +24,7 @@ func main() {
 	_, _ = termcol.Printf("&m%s ", "Magenta")
 
 	// Return formatted text as a string with arguments
-	str, _ = termcol.Sprintf("&c%s ", "Cyan")
+	str = termcol.Sprintf("&c%s ", "Cyan")
 
 	// Print formatted text to a specific writer
 	_, _ = termcol.Fprintf(writer, "&F%s ", "Bold")

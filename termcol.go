@@ -20,9 +20,9 @@ type Formatter struct {
 	successText        string
 	warningText        string
 	errorText          string
-	successColor       colorKey
-	warningColor       colorKey
-	errorColor         colorKey
+	successColor       colorCode
+	warningColor       colorCode
+	errorColor         colorCode
 }
 
 // NewFormatter creates a new Formatter with the default settings and returns it.
@@ -62,7 +62,7 @@ func (f *Formatter) ResetBeforeNewline(b bool) {
 }
 
 // SetSuccessStyle sets the style for success messages in the Formatter. (Default: green "Success: ")
-func (f *Formatter) SetSuccessStyle(color colorKey, text string) {
+func (f *Formatter) SetSuccessStyle(color colorCode, text string) {
 	if color < 0 || int(color) >= len(colorValues) {
 		return
 	}
@@ -71,7 +71,7 @@ func (f *Formatter) SetSuccessStyle(color colorKey, text string) {
 }
 
 // SetWarningStyle sets the style for warning messages in the Formatter. (Default: yellow "Warning: ")
-func (f *Formatter) SetWarningStyle(color colorKey, text string) {
+func (f *Formatter) SetWarningStyle(color colorCode, text string) {
 	if color < 0 || int(color) >= len(colorValues) {
 		return
 	}
@@ -80,7 +80,7 @@ func (f *Formatter) SetWarningStyle(color colorKey, text string) {
 }
 
 // SetErrorStyle sets the style for error messages in the Formatter. // (Default: red "Error: ").
-func (f *Formatter) SetErrorStyle(color colorKey, text string) {
+func (f *Formatter) SetErrorStyle(color colorCode, text string) {
 	if color < 0 || int(color) >= len(colorValues) {
 		return
 	}
@@ -93,40 +93,28 @@ Sprintc returns a formatted string using the provided formatting options.
 '&' is used as the formatting key, '§' resets the formatting.
 Example: Sprintc("& &red-bold §text", termcol.Red, termcol.Bold) will render "red-bold" in red and bold and "text" normally.
 */
-func (f *Formatter) Sprintc(text string, colors ...colorKey) (string, error) {
-	text, err := colorize(f, text, colors)
-	if err != nil {
-		return "", err
-	}
-	return text, nil
+func (f *Formatter) Sprintc(text string, colors ...colorCode) string {
+	text = colorize(f, text, colors)
+	return text
 }
 
 // Printc formats the text using Sprintc and prints it to stdout.
-func (f *Formatter) Printc(text string, colors ...colorKey) (int, error) {
-	text, err := f.Sprintc(text, colors...)
-	if err != nil {
-		return 0, err
-	}
-	i, err := fmt.Fprint(os.Stdout, text)
+func (f *Formatter) Printc(text string, colors ...colorCode) (int, error) {
+	text = f.Sprintc(text, colors...)
+	i, err := fmt.Print(text)
 	return i, err
 }
 
 // Printlnc formats the text using Sprintc and prints it to stdout ending with a newline.
-func (f *Formatter) Printlnc(text string, colors ...colorKey) (int, error) {
-	text, err := f.Sprintc(text, colors...)
-	if err != nil {
-		return 0, err
-	}
-	i, err := fmt.Fprintln(os.Stdout, text)
+func (f *Formatter) Printlnc(text string, colors ...colorCode) (int, error) {
+	text = f.Sprintc(text, colors...)
+	i, err := fmt.Println(text)
 	return i, err
 }
 
 // Fprintc formats the text using Sprintc and prints it to the provided io.Writer.
-func (f *Formatter) Fprintc(w io.Writer, text string, colors ...colorKey) (int, error) {
-	text, err := f.Sprintc(text, colors...)
-	if err != nil {
-		return 0, err
-	}
+func (f *Formatter) Fprintc(w io.Writer, text string, colors ...colorCode) (int, error) {
+	text = f.Sprintc(text, colors...)
 	i, err := fmt.Fprint(w, text)
 	return i, err
 }
@@ -137,53 +125,38 @@ Placeholders are defined as '%X' for fmt placeholders, and '&X' for formatting p
 For example, '&r&F%s' will format the following string, provided by the user, in red and bold.
 The '§' character is used to reset the formatting.
 */
-func (f *Formatter) Sprintf(text string, a ...any) (string, error) {
-	text, err := format(f, text)
-	if err != nil {
-		return "", err
-	}
+func (f *Formatter) Sprintf(text string, a ...any) string {
+	text = format(f, text)
 	if len(a) == 0 {
-		return text, nil
+		return text
 	}
-	return fmt.Sprintf(text, a...), nil
+	return fmt.Sprintf(text, a...)
 }
 
 // Printf formats the text using Sprintf and prints it to stdout.
 func (f *Formatter) Printf(text string, a ...any) (int, error) {
-	text, err := f.Sprintf(text, a...)
-	if err != nil {
-		return 0, err
-	}
-	i, err := fmt.Fprint(os.Stdout, text)
+	text = f.Sprintf(text, a...)
+	i, err := fmt.Print(text)
 	return i, err
 }
 
 // Printlnf formats the text using Sprintf and prints it to stdout ending with a newline.
 func (f *Formatter) Printlnf(text string, a ...any) (int, error) {
-	text, err := f.Sprintf(text, a...)
-	if err != nil {
-		return 0, err
-	}
-	i, err := fmt.Fprintln(os.Stdout, text)
+	text = f.Sprintf(text, a...)
+	i, err := fmt.Println(text)
 	return i, err
 }
 
 // Fprintf formats the text using Sprintf and prints it to the provided io.Writer.
 func (f *Formatter) Fprintf(w io.Writer, text string, a ...any) (int, error) {
-	text, err := f.Sprintf(text, a...)
-	if err != nil {
-		return 0, err
-	}
+	text = f.Sprintf(text, a...)
 	i, err := fmt.Fprint(w, text)
 	return i, err
 }
 
 // Successf prints the text to stdout as a success message in green ending with a newline.
 func (f *Formatter) Successf(text string, a ...any) (int, error) {
-	text, err := f.Sprintf(text, a...)
-	if err != nil {
-		return 0, err
-	}
+	text = f.Sprintf(text, a...)
 	if f.resetAtEnd && !strings.Contains(text, "\033[") {
 		text = text + colorValues[Reset]
 	}
@@ -193,10 +166,7 @@ func (f *Formatter) Successf(text string, a ...any) (int, error) {
 
 // Warningf prints the text to stdout as a warning message in yellow ending with a newline.
 func (f *Formatter) Warningf(text string, a ...any) (int, error) {
-	text, err := f.Sprintf(text, a...)
-	if err != nil {
-		return 0, err
-	}
+	text = f.Sprintf(text, a...)
 	if f.resetAtEnd && !strings.Contains(text, "\033[") {
 		text = text + colorValues[Reset]
 	}
@@ -206,10 +176,7 @@ func (f *Formatter) Warningf(text string, a ...any) (int, error) {
 
 // Errorf prints the text to stdout as an error message in red ending with a newline.
 func (f *Formatter) Errorf(text string, a ...any) (int, error) {
-	text, err := f.Sprintf(text, a...)
-	if err != nil {
-		return 0, err
-	}
+	text = f.Sprintf(text, a...)
 	if f.resetAtEnd && !strings.Contains(text, "\033[") {
 		text = text + colorValues[Reset]
 	}
@@ -220,27 +187,27 @@ func (f *Formatter) Errorf(text string, a ...any) (int, error) {
 // Global functions
 
 // Sprintc is a Wrapper for defaultFormatter.Sprintc (Further information in Formatter.Sprintc)
-func Sprintc(text string, colors ...colorKey) (string, error) {
+func Sprintc(text string, colors ...colorCode) string {
 	return df.Sprintc(text, colors...)
 }
 
 // Printc is a Wrapper for defaultFormatter.Printc (Further information in Formatter.Printc)
-func Printc(text string, colors ...colorKey) (int, error) {
+func Printc(text string, colors ...colorCode) (int, error) {
 	return df.Printc(text, colors...)
 }
 
 // Printlnc is a Wrapper for defaultFormatter.Printlnc (Further information in Formatter.Printlnc)
-func Printlnc(text string, colors ...colorKey) (int, error) {
+func Printlnc(text string, colors ...colorCode) (int, error) {
 	return df.Printlnc(text, colors...)
 }
 
 // Fprintc is a Wrapper for defaultFormatter.Fprintc (Further information in Formatter.Fprintc)
-func Fprintc(w io.Writer, text string, colors ...colorKey) (int, error) {
+func Fprintc(w io.Writer, text string, colors ...colorCode) (int, error) {
 	return df.Fprintc(w, text, colors...)
 }
 
 // Sprintf is a Wrapper for defaultFormatter.Sprintf (Further information in Formatter.Sprintf)
-func Sprintf(text string, a ...any) (string, error) {
+func Sprintf(text string, a ...any) string {
 	return df.Sprintf(text, a...)
 }
 
@@ -274,8 +241,8 @@ func Errorf(text string, a ...any) (int, error) {
 	return df.Errorf(text, a...)
 }
 
-// Color returns the ANSI escape code for the given colorKey.
-func Color(c colorKey) string {
+// Color returns the ANSI escape code for the given colorCode.
+func Color(c colorCode) string {
 	if c < 0 || int(c) >= len(colorValues) {
 		return ""
 	}

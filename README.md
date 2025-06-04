@@ -82,7 +82,7 @@ func main() {
 	var s string
 
 	// Colorize a string with direct color arguments and using fmt formatting
-	s, _ = termcol.Sprintf("&r%s &g%s &b%s &r&F%s §%s",
+	s = termcol.Sprintf("&r%s &g%s &b%s &r&F%s §%s",
 		"Red", "Green", "Blue", "Bold-Red", "Reset")
 	fmt.Println(s)
 	// Note: a space in between two & will be stripped and both & will be used for formatting.
@@ -90,14 +90,14 @@ func main() {
 
 	// Not all colors are available directly with & + color,
 	// in which case, you can use color constants as arguments.
-	s, _ = termcol.Sprintc("&Red &Green & & &Bold-BrightRed with Yellow Background",
+	s = termcol.Sprintc("&Red &Green & & &Bold-BrightRed with Yellow Background",
 		termcol.Red, termcol.Green, termcol.Bold, termcol.BrightRed, termcol.YellowBg)
 	fmt.Println(s)
 
 	// Colorize a string with different formatting options
 	f := termcol.NewFormatter()
 	f.SetKey('#')
-	s, _ = f.Sprintf("#r%s", "Red")
+	s = f.Sprintf("#r%s", "Red")
 	fmt.Println(s)
 }
 ```

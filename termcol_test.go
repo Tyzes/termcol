@@ -32,63 +32,59 @@ func TestParseError(t *testing.T) {
 func TestSprintc(t *testing.T) {
 	type testSprintc struct {
 		text     string
-		colors   []colorKey
+		colors   []colorCode
 		expected string
 	}
 
 	tests := []testSprintc{
-		{"i love &go", []colorKey{Red}, "i love \033[31mgo\033[0m"},
-		{"i &love &go too", []colorKey{Red, Green}, "i \033[31mlove \033[32mgo too\033[0m"},
-		{"go&& is &&&an awe&some language&&", []colorKey{Red, Green}, "go& is &\033[31man awe\033[32msome language&\033[0m"},
-		{"&&&it's & &easy& to learn &&&&&&& and understand&&&", []colorKey{Red, Bold, Green, Yellow, Blue, Reset}, "&\033[31mit's \033[1m\033[32measy\033[33m to learn &&&\033[34m and understand&\033[0m"},
-		{"&Testing is & & &important&!", []colorKey{Red, Underline, Bold, Green, Reset}, "\033[31mTesting is \033[4m\033[1m\033[32mimportant\033[0m!"},
-		{"", []colorKey{}, ""},
-		{"&&&&&&", []colorKey{}, "&&&"},
-		{"&Hello\n&World", []colorKey{Red, Green}, "\033[31mHello\033[0m\n\033[32mWorld\033[0m"},
-		{"&Bold text", []colorKey{Bold}, "\033[1mBold text\033[0m"},
-		{"&Bold &Italic§", []colorKey{Bold, Italic}, "\033[1mBold \033[3mItalic\033[0m"},
-		{"&Bold § normal", []colorKey{Bold}, "\033[1mBold \033[0m normal"},
-		{"&你好 &世界", []colorKey{Red, Green}, "\033[31m你好 \033[32m世界\033[0m"},
-		{"&Fg &Bg &Style§ & & & &Styles combined", []colorKey{Red, GreenBg, Bold, BrightBlue, GrayBg, Italic, Bold}, "\033[31mFg \033[42mBg \033[1mStyle\033[0m \033[94m\033[100m\033[3m\033[1mStyles combined\033[0m"},
-		{"§", []colorKey{}, "\033[0m"},
+		{"i love &go", []colorCode{Red}, "i love \033[31mgo\033[0m"},
+		{"i &love &go too", []colorCode{Red, Green}, "i \033[31mlove \033[32mgo too\033[0m"},
+		{"go&& is &&&an awe&some language&&", []colorCode{Red, Green}, "go& is &\033[31man awe\033[32msome language&\033[0m"},
+		{"&&&it's & &easy& to learn &&&&&&& and understand&&&", []colorCode{Red, Bold, Green, Yellow, Blue, Reset}, "&\033[31mit's \033[1m\033[32measy\033[33m to learn &&&\033[34m and understand&\033[0m"},
+		{"&Testing is & & &important&!", []colorCode{Red, Underline, Bold, Green, Reset}, "\033[31mTesting is \033[4m\033[1m\033[32mimportant\033[0m!"},
+		{"", []colorCode{}, ""},
+		{"&&&&&&", []colorCode{}, "&&&"},
+		{"&Hello\n&World", []colorCode{Red, Green}, "\033[31mHello\033[0m\n\033[32mWorld\033[0m"},
+		{"&Bold text", []colorCode{Bold}, "\033[1mBold text\033[0m"},
+		{"&Bold &Italic§", []colorCode{Bold, Italic}, "\033[1mBold \033[3mItalic\033[0m"},
+		{"&Bold § normal", []colorCode{Bold}, "\033[1mBold \033[0m normal"},
+		{"&你好 &世界", []colorCode{Red, Green}, "\033[31m你好 \033[32m世界\033[0m"},
+		{"&Fg &Bg &Style§ & & & &Styles combined", []colorCode{Red, GreenBg, Bold, BrightBlue, GrayBg, Italic, Bold}, "\033[31mFg \033[42mBg \033[1mStyle\033[0m \033[94m\033[100m\033[3m\033[1mStyles combined\033[0m"},
+		{"§", []colorCode{}, "\033[0m"},
 	}
 
 	for _, v := range tests {
-		result, err := Sprintc(v.text, v.colors...)
-		if err != nil && err.Error() != v.expected {
-			t.Errorf("\nc(%s, %v)\ngot error\n%s\nexpected\n%s", v.text, v.colors, err, v.expected)
-		}
-		if err == nil && result != v.expected {
+		if result := Sprintc(v.text, v.colors...); result != v.expected {
 			t.Errorf("\nc(%s, %v)\ngot\n%s\nexpected\n%s", v.text, v.colors, result, v.expected)
 		}
 	}
 
 	type testSprintcErr struct {
 		text     string
-		colors   []colorKey
+		colors   []colorCode
 		expected string
 	}
 	errTests := []testSprintcErr{
-		{"&Hello &World", []colorKey{Red, Green, Blue}, "termcol parse error: Number of colors (3) does not match number of keys (2)\n&Hello &World"},
-		{"&only one", []colorKey{}, "termcol parse error: Number of colors (0) does not match number of keys (1)\n&only one"},
-		{"Hello World", []colorKey{Red}, "termcol parse error: Number of colors (1) does not match number of keys (0)\nHello World"},
+		{"&Hello &World", []colorCode{Red, Green, Blue}, "termcol: Number of colors (3) does not match number of keys (2)\n&Hello &World"},
+		{"&only one", []colorCode{}, "termcol: Number of colors (0) does not match number of keys (1)\n&only one"},
+		{"Hello World", []colorCode{Red}, "termcol: Number of colors (1) does not match number of keys (0)\nHello World"},
 	}
 
 	for _, v := range errTests {
-		if _, err := Sprintc(v.text, v.colors...); err == nil || err.Error() != v.expected {
-			t.Errorf("\nc(%s, %v)\ngot\n%s\nexpected\n%s", v.text, v.colors, err, v.expected)
+		if res := Sprintc(v.text, v.colors...); res != v.expected {
+			t.Errorf("\nc(%s, %v)\ngot\n%s\nexpected\n%s", v.text, v.colors, res, v.expected)
 		}
 	}
 }
 
 func TestSprintf(t *testing.T) {
-	type testSprintc struct {
+	type testSprintf struct {
 		text     string
 		a        []any
 		expected string
 	}
 
-	tests := []testSprintc{
+	tests := []testSprintf{
 		{"i love &r%s", []any{"go"}, "i love \033[31mgo\033[0m"},
 		{"i &r%s &g%s %v", []any{"love", "go", "too"}, "i \033[31mlove \033[32mgo too\033[0m"},
 		{"go&& is &&&ran awe&gsome language&&", []any{}, "go& is &\033[31man awe\033[32msome language&\033[0m"},
@@ -106,33 +102,25 @@ func TestSprintf(t *testing.T) {
 	}
 
 	for _, v := range tests {
-		result, err := Sprintf(v.text, v.a...)
-		if err != nil && err.Error() != v.expected {
-			t.Errorf("\nc(%s, %v)\ngot error\n%s\nexpected\n%s", v.text, v.a, err, v.expected)
-		}
-		if err == nil && result != v.expected {
+		if result := Sprintf(v.text, v.a...); result != v.expected {
 			t.Errorf("\nc(%s, %v)\ngot\n%s\nexpected\n%s", v.text, v.a, result, v.expected)
 		}
 	}
 
-	type testSprintcErr struct {
+	type testSprintfErr struct {
 		text     string
 		a        []any
 		expected string
 	}
-	errTests := []testSprintcErr{
-		{"&Hello &World", []any{}, "termcol parse error: Illegal character 'H' at index 1\n&Hello &World\n ^ HERE"},
-		{"&only one %s", []any{"str"}, "termcol parse error: Illegal character 'o' at index 1\n&only one %s\n ^ HERE"},
-		{"Hello World", []any{}, ""},
+	errTests := []testSprintfErr{
+		{"&Hello &World", []any{}, "[termcol: Invalid color key 'H']ello &World"},
+		{"&only one %s", []any{"str"}, "[termcol: Invalid color key 'o']nly one str"},
+		{"Hello World", []any{}, "Hello World"},
 	}
 
 	for _, v := range errTests {
-		if _, err := Sprintf(v.text, v.a...); err == nil || err.Error() != v.expected {
-			if err == nil && v.expected != "" {
-				t.Errorf("\nc(%s, %v)\ngot nil error\nexpected\n%s", v.text, v.a, v.expected)
-			} else if err != nil {
-				t.Errorf("\nc(%s, %v)\ngot\n%s\nexpected\n%s", v.text, v.a, err, v.expected)
-			}
+		if res := Sprintf(v.text, v.a...); res != v.expected {
+			t.Errorf("c(%s, %v)\ngot\n%s\nexpected\n%s", v.text, v.a, res, v.expected)
 		}
 	}
 
@@ -142,18 +130,15 @@ func TestSprintf(t *testing.T) {
 	f.ResetAtEnd(false)
 	f.ResetBeforeNewline(false)
 
-	tests = []testSprintc{
+	tests = []testSprintf{
 		{"i love Nr%s", []any{"go"}, "i love \033[31mgo"},
 		{"i Nr%s Ng%s %vn", []any{"love", "go", "too"}, "i \033[31mlove \033[32mgo too\033[0m"},
 		{"NrHello\nNgWorld", []any{}, "\033[31mHello\n\033[32mWorld"},
+		{"Nr你好 &g世界", []any{}, "\033[31m你好 &g世界"},
 	}
 
 	for _, v := range tests {
-		result, err := f.Sprintf(v.text, v.a...)
-		if err != nil && err.Error() != v.expected {
-			t.Errorf("\nc(%s, %v)\ngot error\n%s\nexpected\n%s", v.text, v.a, err, v.expected)
-		}
-		if err == nil && result != v.expected {
+		if result := f.Sprintf(v.text, v.a...); result != v.expected {
 			t.Errorf("\nc(%s, %v)\ngot\n%s\nexpected\n%s", v.text, v.a, result, v.expected)
 		}
 	}

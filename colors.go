@@ -1,9 +1,9 @@
 package termcol
 
-type colorKey int
+type colorCode int
 
 const (
-	Reset colorKey = iota // Reset Formatting, §
+	Reset colorCode = iota // Reset Formatting, §
 
 	Black         // Color Black, &s
 	Red           // Color Red, &r
@@ -90,8 +90,8 @@ var colorValues = []string{
 	"\033[107m", // 36: BrightWhiteBg
 }
 
-// Mapping colorKey keys to colorKey values
-var colorKeys = map[rune]colorKey{
+// Mapping colorCode keys to colorCode values
+var colorKeys = map[rune]colorCode{
 	's': Black,         // &s
 	'r': Red,           // &r
 	'g': Green,         // &g

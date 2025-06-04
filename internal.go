@@ -22,7 +22,7 @@ func parse(f *Formatter, text string) []int {
 	return p
 }
 
-func replace(f *Formatter, text string, del int, keys []int, colors []colorKey) string {
+func replace(f *Formatter, text string, del int, keys []int, colors []colorCode) string {
 	chars := []rune(text)
 
 	for i := len(keys) - 1; i >= 0; i-- {
@@ -64,44 +64,69 @@ func replace(f *Formatter, text string, del int, keys []int, colors []colorKey) 
 	return text
 }
 
-func colorize(f *Formatter, text string, colors []colorKey) (string, error) {
+func colorize(f *Formatter, text string, colors []colorCode) string {
 	keys := parse(f, text)
 	if len(keys) != len(colors) {
-		return "", ParseError{fmt.Sprintf("Number of colors (%d) does not match number of keys (%d)", len(colors), len(keys)), text, -1}
+		b := strings.Builder{}
+		b.WriteString("termcol: Number of colors (")
+		b.WriteString(fmt.Sprint(len(colors)))
+		b.WriteString(") does not match number of keys (")
+		b.WriteString(fmt.Sprint(len(keys)))
+		b.WriteRune(')')
+		b.WriteRune('\n')
+		b.WriteString(text)
+		return b.String()
 	}
 
 	for i := 0; i < len(colors); i++ {
 		if colors[i] < 0 || int(colors[i]) >= len(colorValues) {
-			return "", ParseError{fmt.Sprintf("Invalid color code %d as argument %d", colors[i], i+2), text, keys[i]}
+			b := strings.Builder{}
+			b.WriteString("termcol: Invalid color code ")
+			b.WriteString(fmt.Sprint(colors[i]))
+			b.WriteString(" as argument ")
+			b.WriteString(fmt.Sprint(i + 2))
+			b.WriteRune('\n')
+			b.WriteString(text)
+			return b.String()
 		}
 	}
 
 	text = replace(f, text, 1, keys, colors)
-	return text, nil
+	return text
 }
 
-func format(f *Formatter, text string) (string, error) {
+func format(f *Formatter, text string) string {
 	if len(text) == 0 {
-		return text, nil
+		return text
 	}
 
 	keys := parse(f, text)
 
 	if len(keys) != 0 && keys[len(keys)-1]+1 >= len(text) {
-		return "", ParseError{"Invalid colorKey code at string end - colorKey code without closing key", text, len(text) - 1}
+		return text[:len(text)-2] + "[termcol: Color key without value at end of text]"
 	}
 
-	var colors []colorKey
+	var colors []colorCode
 	chars := []rune(text)
-	for i := 0; i < len(keys); i++ {
-		color, ok := colorKeys[chars[keys[i]+1]]
+	for _, key := range keys {
+		color, ok := colorKeys[chars[key+1]]
 		if !ok {
-			return "", ParseError{Text: text, Pos: keys[i] + 1}
+			b := strings.Builder{}
+			b.WriteString(text[:key])
+			b.WriteString("[termcol: Invalid color key '")
+			b.WriteRune(chars[key+1])
+			b.WriteString("']")
+			b.WriteString(text[key+2:])
+			return b.String()
 		}
 		colors = append(colors, color)
 	}
 
 	text = replace(f, text, 2, keys, colors)
 
-	return text, nil
+	return text
+}
+
+func isColorCode(c colorCode) bool {
+	return c >= 0 && int(c) < len(colorValues)
 }
